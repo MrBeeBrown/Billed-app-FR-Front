@@ -54,6 +54,7 @@ export default class {
             })
           console.log('length', bills.length)
           bills.sort((a, b) => b.date - a.date)
+          console.log(bills)
           return bills
         })
     }
