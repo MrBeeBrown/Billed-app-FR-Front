@@ -29,6 +29,7 @@ export default class NewBill {
     formData.append('email', email)
     if (!this.extension.includes(this.fileExtension)) {
       document.querySelector('#extension_error').style.display = 'block'
+      return
     } else {
       document.querySelector('#extension_error').style.display = 'none'
     }
