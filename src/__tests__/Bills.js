@@ -2,14 +2,18 @@
  * @jest-environment jsdom
  */
 
-import { screen, waitFor } from "@testing-library/dom"
+import { screen, waitFor, within } from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 
-/* jest.mock("../app/store", () => mockStore) */
+import "@testing-library/jest-dom";
+import userEvent from "@testing-library/user-event";
+import mockedStore from "../__mocks__/store";
+import Bills from "../containers/Bills.js";
+
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -37,74 +41,83 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+
+    // Test d'affichage de la page
+    describe("When I went on Bills page and it is loading", () => {
+      test("Then, Loading page should be rendered", () => {
+        document.body.innerHTML = BillsUI({ loading: true })
+        expect(screen.getByText("Loading...")).toBeVisible()
+        document.body.innerHTML = ""
+      })
+    })
+
+    // Test d'affichage du message d'erreur
+    describe("When I am on Bills page but back-end send an error message", () => {
+      test("Then, Error page should be rendered", () => {
+        document.body.innerHTML = BillsUI({ error: "error message" })
+        expect(screen.getByText("Erreur")).toBeVisible()
+        document.body.innerHTML = ""
+      })
+    })
+
+    // Test d'affichage de la modale IconEye
+    describe("When I click on one eye icon", () => {
+      test("Then a modal should open", async () => {
+        const onNavigate = pathname => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        Object.defineProperty(window, "localStorage", { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        })
+        )
+        const billsPage = new Bills({
+          document,
+          onNavigate,
+          store: mockedStore,
+          localStorage: window.localStorage,
+        })
+        document.body.innerHTML = BillsUI({ data: bills })
+        const iconEyes = screen.getAllByTestId("icon-eye")
+        const handleClickIconEye = jest.fn(billsPage.handleClickIconEye);
+        const modale = document.getElementById("modaleFile")
+        $.fn.modal = jest.fn(() => modale.classList.add("show"))
+        iconEyes.forEach(iconEye => {
+          iconEye.addEventListener("click", () => handleClickIconEye(iconEye))
+          userEvent.click(iconEye)
+          expect(handleClickIconEye).toHaveBeenCalled()
+          expect(modale).toHaveClass("show")
+        })
+      })
+    })
+
+    // Test création d'une note de frais
+    describe("When I click on New Bill Button", () => {
+      test("Then I should be sent on New Bill form", () => {
+        const onNavigate = pathname => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        Object.defineProperty(window, "localStorage", { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+          type: 'Employee'
+        })
+        )
+        const bills = new Bills({
+          document,
+          onNavigate,
+          store: mockedStore,
+          localStorage: window.localStorage,
+        })
+        document.body.innerHTML = BillsUI({ data: bills })
+        const buttonNewBill = screen.getByRole("button", {
+          name: /Nouvelle note de frais/i,
+        })
+        expect(buttonNewBill).toBeTruthy()
+        const handleClickNewBill = jest.fn(bills.handleClickNewBill)
+        buttonNewBill.addEventListener("click", handleClickNewBill)
+        userEvent.click(buttonNewBill)
+        expect(handleClickNewBill).toHaveBeenCalled()
+      })
+    })
   })
 })
-
-// test d'intégration GET
-/* describe("Given I am a user connected as Admin", () => {
-  describe("When I navigate to Dashboard", () => {
-    test("fetches bills from mock API GET", async () => {
-      localStorage.setItem("user", JSON.stringify({ type: "Admin", email: "a@a" }));
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.Dashboard)
-      await waitFor(() => screen.getByText("Validations"))
-      const contentPending = await screen.getByText("En attente (1)")
-      expect(contentPending).toBeTruthy()
-      const contentRefused = await screen.getByText("Refusé (2)")
-      expect(contentRefused).toBeTruthy()
-      expect(screen.getByTestId("big-billed-icon")).toBeTruthy()
-    })
-    describe("When an error occurs on API", () => {
-      beforeEach(() => {
-        jest.spyOn(mockStore, "bills")
-        Object.defineProperty(
-          window,
-          'localStorage',
-          { value: localStorageMock }
-        )
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Admin',
-          email: "a@a"
-        }))
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.appendChild(root)
-        router()
-      })
-      test("fetches bills from an API and fails with 404 message error", async () => {
-
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            list: () => {
-              return Promise.reject(new Error("Erreur 404"))
-            }
-          }
-        })
-        window.onNavigate(ROUTES_PATH.Dashboard)
-        await new Promise(process.nextTick);
-        const message = await screen.getByText(/Erreur 404/)
-        expect(message).toBeTruthy()
-      })
-
-      test("fetches messages from an API and fails with 500 message error", async () => {
-
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            list: () => {
-              return Promise.reject(new Error("Erreur 500"))
-            }
-          }
-        })
-
-        window.onNavigate(ROUTES_PATH.Dashboard)
-        await new Promise(process.nextTick);
-        const message = await screen.getByText(/Erreur 500/)
-        expect(message).toBeTruthy()
-      })
-    })
-
-  })
-}) */
