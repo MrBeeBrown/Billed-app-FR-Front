@@ -119,5 +119,31 @@ describe("Given I am connected as an employee", () => {
         expect(handleClickNewBill).toHaveBeenCalled()
       })
     })
+
+    /* // Test getBills
+    describe("When I navigate to Bills Page", () => {
+      test("fetches bills from mock API GET", async () => {
+        jest.spyOn(mockedStore, "bills")
+        Object.defineProperty(window, "localStorage", { value: localStorageMock })
+        localStorage.setItem('user', JSON.stringify({
+          type: 'Employee', email: 'a@a'
+        })
+        )
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+
+        await waitFor(() => screen.getByText("Mes notes de frais"))
+        const newBillBtn = await screen.findByRole("button", {
+          name: /Nouvelle note de frais/i,
+        });
+
+        const billsTableRows = screen.getByTestId("tbody")
+        expect(newBillBtn).toBeTruthy()
+        expect(billsTableRows).toBeTruthy()
+      })
+    }) */
   })
 })
