@@ -3,7 +3,7 @@
  */
 
 import { screen, waitFor, within } from "@testing-library/dom";
-// import de la librairie pour l'envirronement de test
+// import de la librairie pour l’environnement de test
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import BillsUI from "../views/BillsUI.js";
@@ -56,8 +56,6 @@ describe("Given I am connected as an employee", () => {
     });
 
 
-    // Ajout des tests unitaires
-   
     // Test du bouton "nouvelle note de frais"
     describe("When I click on New Bill Button", () => {
       test("Then I should be sent on New Bill form", () => {
@@ -66,7 +64,7 @@ describe("Given I am connected as an employee", () => {
           document.body.innerHTML = ROUTES({ pathname });
         };
         // On définie la propriété localStorage de l'objet window pour utiliser une instance de stockage local "localStorageMock" pour les test
-        Object.defineProperty(window, "localStorage", { 
+        Object.defineProperty(window, "localStorage", {
           value: localStorageMock,
         });
         // On initialise ensuite les données de l'utilisateur pour les stocker en utilisant "window.localStorage.setItem"
@@ -91,14 +89,14 @@ describe("Given I am connected as an employee", () => {
         expect(buttonNewBill).toBeTruthy();
         const handleClickNewBill = jest.fn(bills.handleClickNewBill);
         buttonNewBill.addEventListener("click", handleClickNewBill);
-        userEvent.click(buttonNewBill); 
+        userEvent.click(buttonNewBill);
         expect(handleClickNewBill).toHaveBeenCalled();
       });
     });
     // Test de la fonction handleClickIconEye
     describe("When I click on one eye icon", () => {
       test("Then a modal should open", async () => {
-         // On définie la fonction onNavigate pour charger les données de la page
+        // On définie la fonction onNavigate pour charger les données de la page
         const onNavigate = pathname => {
           document.body.innerHTML = ROUTES({ pathname });
         };
@@ -106,7 +104,7 @@ describe("Given I am connected as an employee", () => {
         Object.defineProperty(window, "localStorage", {
           value: localStorageMock,
         });
-         // On initialise ensuite les données de l'utilisateur pour les stocker en utilisant "window.localStorage.setItem"
+        // On initialise ensuite les données de l'utilisateur pour les stocker en utilisant "window.localStorage.setItem"
         window.localStorage.setItem(
           "user",
           JSON.stringify({
@@ -119,16 +117,16 @@ describe("Given I am connected as an employee", () => {
           onNavigate,
           store: mockedStore,
           localStorage: window.localStorage,
-        }); 
+        });
         // On charge les données
         document.body.innerHTML = BillsUI({ data: bills });
-        // On récupère tous les éléménts du DOM ayant pour ID "icon-eye"
-        const iconEyes = screen.getAllByTestId("icon-eye"); 
+        // On récupère tous les éléments du DOM ayant pour ID "icon-eye"
+        const iconEyes = screen.getAllByTestId("icon-eye");
         // On créé la fonction jest pour gérer les clics sur ces éléments
         const handleClickIconEye = jest.fn(billsPage.handleClickIconEye);
-        // On récupère tous les éléménts du DOM ayant pour ID "modaleFile"
+        // On récupère tous les éléments du DOM ayant pour ID "modaleFile"
         const modale = document.getElementById("modaleFile");
-        $.fn.modal = jest.fn(() => modale.classList.add("show")); 
+        $.fn.modal = jest.fn(() => modale.classList.add("show"));
         // On simule un clic sur chaque éléments
         iconEyes.forEach(iconEye => {
           iconEye.addEventListener("click", () => handleClickIconEye(iconEye));
@@ -146,9 +144,9 @@ describe("Given I am connected as an employee", () => {
       test("Then, Loading page should be rendered", () => {
         // On simule l'ouverture de la page et on modifie le contenu HTML avec les paramètres de BillUI soit la value true
         document.body.innerHTML = BillsUI({ loading: true });
-        // On vérifie si le texte Loading... est visible sur la page en utilisant la fonction screen.getByText de la librairy "testing-library"
+        // On vérifie si le texte Loading... est visible sur la page en utilisant la fonction screen.getByText de la library "testing-library"
         expect(screen.getByText("Loading...")).toBeVisible();
-        // On vide le contenu pour eviter les effets de bord dans le prochain test
+        // On vide le contenu pour éviter les effets de bord dans le prochain test
         document.body.innerHTML = "";
       });
     });
@@ -156,11 +154,11 @@ describe("Given I am connected as an employee", () => {
     // Test pour vérifier si le message d'erreur s'affiche correctement
     describe("When I am on Bills page but back-end send an error message", () => {
       test("Then, Error page should be rendered", () => {
-         // On simule l'ouverture de la page et on modifie le contenu HTML avec les paramètres de BillUI soit un objet contenant  error: "error message"
+        // On simule l'ouverture de la page et on modifie le contenu HTML avec les paramètres de BillUI soit un objet contenant  error: "error message"
         document.body.innerHTML = BillsUI({ error: "error message" });
-        // On vérifie si le texte Erreur est visible sur la page en utilisant la fonction screen.getByText de la librairy "testing-library" si le texte est visible c'est que la page erreutr est affiché 
+        // On vérifie si le texte Erreur est visible sur la page en utilisant la fonction screen.getByText de la library "testing-library" si le texte est visible c'est que la page erreur est affiché 
         expect(screen.getByText("Erreur")).toBeVisible();
-        // On vide le contenu pour eviter les effets de bord dans le prochain test
+        // On vide le contenu pour éviter les effets de bord dans le prochain test
         document.body.innerHTML = "";
       });
     });
@@ -183,12 +181,12 @@ describe("Given I am connected as an employee", () => {
         document.body.append(root);
         router();
         window.onNavigate(ROUTES_PATH.Bills);
-        
+
         await waitFor(() => screen.getByText("Mes notes de frais"));
         const newBillBtn = await screen.findByRole("button", {
           name: /nouvelle note de frais/i,
         });
-        
+
         const billsTableRows = screen.getByTestId("tbody");
         // On vérifie l'existence du bouton "Nouvelle note de frais"
         expect(newBillBtn).toBeTruthy();

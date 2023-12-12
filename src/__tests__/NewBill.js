@@ -49,7 +49,6 @@ describe("Given I am connected as an employee", () => {
 		test("then I should stay on new 'Bill page'", () => {
 			// Navigate to the new page
 			window.onNavigate(ROUTES_PATH.NewBill);
-			// Create instant of newBill
 			const newBill = new NewBill({
 				document,
 				onNavigate,
@@ -65,7 +64,6 @@ describe("Given I am connected as an employee", () => {
 			expect(screen.getByTestId("file").value).toBe("");
 
 			const form = screen.getByTestId("form-new-bill");
-			// mock the function handleSubmit
 			const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
 
 			form.addEventListener("submit", handleSubmit);
@@ -93,7 +91,6 @@ describe("Given I am connected as an employee", () => {
 			target: { files: [new File(["file.pdf"], "file.pdf", { type: "image/pdf" })] },
 		});
 
-		// [BUG HUNT] - Bills
 		expect(handleChangeFile).toHaveBeenCalled();
 		expect(attachedFile.files[0].name).toBe("file.pdf");
 
@@ -104,7 +101,6 @@ describe("Given I am connected as an employee", () => {
 			expect.stringContaining("Formats acceptés : .jpg, .jpeg, .png")
 		);
 
-		//* format valid
 		test("Then it should accept the file when it as the right format", () => {
 			Object.defineProperty(window, "localStorage", { value: localStorageMock });
 			window.localStorage.setItem(
@@ -144,7 +140,7 @@ describe("Given I am connected as an employee", () => {
 	});
 });
 
-//** Test d'intégration (POST)
+// Test d'intégration (POST)
 
 describe("Given I am a user connected as Employee", () => {
 	describe("When I add a new bill", () => {
@@ -161,7 +157,7 @@ describe("Given I am a user connected as Employee", () => {
 				commentary: "test",
 				file: new File(["test"], "test.png", { type: "image/png" }),
 			};
-			//On récupère les éléments
+			//Récupération les éléments
 			const formNewBill = screen.getByTestId("form-new-bill");
 			const inputExpenseName = screen.getByTestId("expense-name");
 			const inputExpenseType = screen.getByTestId("expense-type");
@@ -172,7 +168,7 @@ describe("Given I am a user connected as Employee", () => {
 			const inputCommentary = screen.getByTestId("commentary");
 			const inputFile = screen.getByTestId("file");
 
-			//On simule les valeurs
+			//Simulation les valeurs
 			fireEvent.change(inputExpenseName, { target: { value: inputData.name } });
 			expect(inputExpenseName.value).toBe(inputData.name);
 
